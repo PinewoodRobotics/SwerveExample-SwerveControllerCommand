@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.CANCoder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -21,8 +23,8 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
+          //DriveConstants.kFrontLeftDriveEncoderPorts,
+          DriveConstants.kFrontLeftTurningEncoderPort,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
@@ -30,8 +32,8 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
+          //DriveConstants.kRearLeftDriveEncoderPorts,
+          DriveConstants.kRearLeftTurningEncoderPort,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
@@ -39,8 +41,8 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
+          //DriveConstants.kFrontRightDriveEncoderPorts,
+          DriveConstants.kFrontRightTurningEncoderPort,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
@@ -48,8 +50,8 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
+          //DriveConstants.kRearRightDriveEncoderPorts,
+          DriveConstants.kRearRightTurningEncoderPort,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
@@ -153,6 +155,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.resetEncoders();
     m_rearRight.resetEncoders();
   }
+
+  //public void getTurningEncoderDistance(CANCoder encoder, double lastPos){
+  //  double distance = ()
+  //}
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
