@@ -14,12 +14,19 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
-public class SwerveModule {
-  private final Spark m_driveMotor;
-  private final Spark m_turningMotor;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-  private final Encoder m_driveEncoder;
-  private final Encoder m_turningEncoder;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+
+public class SwerveModule {
+  private final CANSparkMax m_driveMotor;
+  private final CANSparkMax m_turningMotor;
+
+  //private final CANCoder m_driveEncoder;
+  private final CANCoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -34,6 +41,12 @@ public class SwerveModule {
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
+  // TODO - figure out why the member variables of the config dont work
+ // public final CANCoderConfiguration config = new CANCoderConfiguration();
+  //config.sensorCoefficient = 2 * Math.PI / 4096.0;
+  //config.unitString = "rad";
+  //config.sensorTimeBase = SensorTimeBase.PerSecond;
+
   /**
    * Constructs a SwerveModule.
    *
@@ -47,29 +60,38 @@ public class SwerveModule {
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int[] driveEncoderChannels,
-      int[] turningEncoderChannels,
+      //int driveEncoderChannels,
+      int turningEncoderChannel,
       boolean driveEncoderReversed,
       boolean turningEncoderReversed) {
-    m_driveMotor = new Spark(driveMotorChannel);
-    m_turningMotor = new Spark(turningMotorChannel);
+    m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+    m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
 
-    m_driveEncoder = new Encoder(driveEncoderChannels[0], driveEncoderChannels[1]);
+    //m_driveEncoder = new CANCoder(turningEncoderChannel);
 
-    m_turningEncoder = new Encoder(turningEncoderChannels[0], turningEncoderChannels[1]);
+    RelativeEncoder m_driveEncoder = m_driveMotor.getEncoder();
+
+    m_turningEncoder = new CANCoder(turningEncoderChannel);
+    //m_turningEncoder.configAllSettings(config);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
+    // resolution.ModuleConstants
     m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
 
+    //Encoder m_testEncoder = new Encoder(turningEncoderChannel, turningEncoderChannel);
+
+    //m_testEncoder.setDistancePerPulse(turningEncoderChannel);
+
+
     // Set whether drive encoder should be reversed or not
-    m_driveEncoder.setReverseDirection(driveEncoderReversed);
+    m_driveEncoder.setInverted(driveEncoderReversed);
+    //replaced a setReverseDirection call, same parameters
 
     // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
-    m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
+    //m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
 
     // Set whether turning encoder should be reversed or not
     m_turningEncoder.setReverseDirection(turningEncoderReversed);
@@ -86,8 +108,10 @@ public class SwerveModule {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+        m_driveEncoder.getVelocity(), new Rotation2d(m_turningEncoder.getDistance()));
+        // replaced driveEncoder.getRate()
   }
+
 
   /**
    * Returns the current position of the module.
@@ -119,12 +143,15 @@ public class SwerveModule {
 
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(driveOutput);
+    System.out.println(driveOutput);
     m_turningMotor.set(turnOutput);
+    System.out.println(turnOutput);
   }
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_driveEncoder.reset();
+    //double lastPos = m_turningEncoder.getPosition();
     m_turningEncoder.reset();
   }
 }
